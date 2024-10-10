@@ -14,38 +14,42 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+const targetChatId = process.env.CHAT_ID;
+
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
   let ids;
 
-  if (text.includes("EOD Ceria Report")) {
-    ids = process.env.EOD_CERIA_REPORT_ID;
-  } else if (
-    text.includes("Report Autodebet") ||
-    text.includes("Early CERIA")
-  ) {
-    ids = process.env.REPORT_AUTODEBET_ID;
-  }
+  if (chatId === targetChatId) {
+    if (text.includes("EOD Ceria Report")) {
+      ids = process.env.EOD_CERIA_REPORT_ID;
+    } else if (
+      text.includes("Report Autodebet") ||
+      text.includes("Early CERIA")
+    ) {
+      ids = process.env.REPORT_AUTODEBET_ID;
+    }
 
-  if (ids) {
-    const apiUrl = process.env.API_URL;
-    const headers = {
-      "x-api-key": process.env.API_KEY,
-      ids,
-      "Content-Type": "text/plain",
-    };
+    if (ids) {
+      const apiUrl = process.env.API_URL;
+      const headers = {
+        "x-api-key": process.env.API_KEY,
+        ids,
+        "Content-Type": "text/plain",
+      };
 
-    axios
-      .post(apiUrl, text, { headers })
-      .then((response) => {
-        console.log(response.data);
-        bot.sendMessage(chatId, response.data);
-      })
-      .catch((error) => {
-        console.error("Gagal mengirim pesan ke API:", error);
-        bot.sendMessage(chatId, "Gagal mengirim pesan ke API.");
-      });
+      axios
+        .post(apiUrl, text, { headers })
+        .then((response) => {
+          console.log(response.data);
+          bot.sendMessage(chatId, response.data);
+        })
+        .catch((error) => {
+          console.error("Gagal mengirim pesan ke API:", error);
+          bot.sendMessage(chatId, "Gagal mengirim pesan ke API.");
+        });
+    }
   }
 });
 

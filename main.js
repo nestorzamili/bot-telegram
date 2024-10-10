@@ -10,11 +10,12 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Chat ID grup yang ingin dikirim pesan
+const targetChatId = -4557574282;
+
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
-
-const targetChatId = process.env.CHAT_ID;
 
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
@@ -42,7 +43,6 @@ bot.on("message", (msg) => {
       axios
         .post(apiUrl, text, { headers })
         .then((response) => {
-          console.log(response.data);
           bot.sendMessage(chatId, response.data);
         })
         .catch((error) => {

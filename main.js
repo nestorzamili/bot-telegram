@@ -10,8 +10,7 @@ const bot = new TelegramBot(token, { polling: true });
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Chat ID grup yang ingin dikirim pesan
-const targetChatId = -4557574282;
+const targetChatId = process.env.CHAT_ID;
 
 app.get("/", (req, res) => {
   res.send("Server is running");
@@ -22,7 +21,9 @@ bot.on("message", (msg) => {
   const text = msg.text;
   let ids;
 
-  if (chatId === targetChatId) {
+  const isBotMessage = msg.from.is_bot;
+
+  if (chatId === targetChatId && isBotMessage) {
     if (text.includes("EOD Ceria Report")) {
       ids = process.env.EOD_CERIA_REPORT_ID;
     } else if (
@@ -43,6 +44,7 @@ bot.on("message", (msg) => {
       axios
         .post(apiUrl, text, { headers })
         .then((response) => {
+          console.log(response.data);
           bot.sendMessage(chatId, response.data);
         })
         .catch((error) => {
